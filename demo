@@ -1,0 +1,89 @@
+import requests
+import json
+import pandas as pd
+from datetime import datetime
+import os
+from openpyxl.styles import *
+
+
+class Wechat():
+    def __init__(self):
+        self.appid = ''
+        self.secureid = ''
+        self.UserAgent = ''       
+        self.token_url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}'
+    
+    def get_autotoken(self):
+        response_ = requests.get(self.token_url,self.UserAgent) 
+        json_data = response_.content.decode('utf-8')   
+        dict_data = json.loads(json_data)
+        print(dict_data)
+        if 'errcode' not in dict_data:
+            access_token = dict_data['access_token']
+            expire_time = dict_data['expires_in']
+            return access_token
+
+    def get_targetData(self,aceess_token):
+        pass
+
+    def writeExcel():
+        pass
+    def write_pic(filename, picture):
+        """
+        将图片写入excel
+        :param filename:
+        :param picture:
+        :return:
+        """
+        wb = openpyxl.load_workbook(filename)
+        ws = wb.create_sheet('pic')
+        image = Image(picture)
+        ws.add_image(image)
+        wb.save(filename)
+
+
+    def writeExcel_new(input):
+        """
+        将input写入Excel
+        :param input:
+        :return:
+        """
+        row_num = 2
+        today = str(datetime.today()).split(" ")[0]
+        filename = "MmlTestResult-" + today + ".xlsx"
+
+        if os.path.exists(filename):
+            os.remove(filename)
+
+        # 创建
+        wb = openpyxl.Workbook()
+        ws = wb.create_sheet('MML-Test')
+        ws.cell(row=1, column=1, value='MmlCmd')
+        ws.cell(row=1, column=2, value='Result')
+        ws.cell(row=1, column=3, value='Note')
+        ws.column_dimensions['A'].width = 50
+        ws.column_dimensions['B'].width = 9
+        ws.column_dimensions['C'].width = 45
+
+        fill = PatternFill(fill_type='solid', start_color='F28500')
+        ws['A1'].fill = fill
+        ws['B1'].fill = fill
+        ws['C1'].fill = fill
+
+        for item in input:
+            if item[1] != 'pass':
+                ws.cell(row_num, 1).value = item[0]
+                ws.cell(row_num, 2).value = item[1]
+                ws.cell(row_num, 3).value = item[2]
+            else:
+                ws.cell(row_num, 1).value = item[0]
+                ws.cell(row_num, 2).value = item[1]
+                ws.cell(row_num, 3).value = item[2]
+            row_num += 1
+        #  保存
+        wb.save(filename)
+
+
+    def run(self):
+        access_token = self.get_autotoken()
+        self.get_targetData(access_token)
