@@ -1,0 +1,63 @@
+import pandas as pd
+import re
+from pprint import pprint
+
+data_list = [{},{}]
+file_list = []
+for i in range(1,31):
+    file_name = 'E:/wechat_data/11-{}.xlsx'.format(i)
+    file_list.append(file_name)
+
+def get_excel():
+    for f in file_list:
+        every_data = {}
+        df = pd.read_excel(f)
+        df = df[['二级菜单','菜单点击人数']]
+        df = df.dropna(axis=0,how='all')
+        print(df)
+        df = df.set_index('二级菜单').to_dict()['菜单点击人数']
+
+        print(df)
+        break
+
+
+
+
+
+
+def test():
+    every_data = {}
+    f = 'E:/wechat_data/11-15.xlsx'
+    df = pd.read_excel(f)
+    df.columns=['版本','一级菜单','二级菜单','菜单点击次数','菜单点击人数','人均点击次数']
+    df = df.drop(0)
+    df = df[['二级菜单', '菜单点击人数']]
+    df = df.dropna(axis=0, how='all')
+    print(df)
+    df_01 = df.set_index('菜单点击人数').to_dict()['二级菜单']
+    print(df_01)
+
+    df_02 = df.to_dict()
+    second_menu = df_02['二级菜单']
+    menu_click = df_02['菜单点击人数']
+    for item in df_01.items():
+        print(item)
+        menu = item[1]
+        click = item[0]
+        if menu not in every_data.keys():
+            every_data[menu] = df_01[click]
+        else:
+            every_data[menu] = df_01[click] + every_data[menu]
+    print(every_data)
+
+
+    # for value in
+    # [{'':{}}.{}]
+    # print(df_01)
+    # pprint(df_02)
+
+    # for menu,click in df:
+    #     print(menu,click)
+
+# get_excel()
+test()
