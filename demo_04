@@ -1,0 +1,89 @@
+
+# -*- coding:UTF-8 -*-
+
+import pandas as pd
+import re
+from pprint import pprint
+import re
+from openpyxl.styles import *
+import openpyxl
+import collections
+import os
+
+path = 'D:/MML常用命令'
+
+for file in os.listdir(path):
+    file_path = path + file
+    # print(file_path)
+
+def get_excel():
+    data_list = []
+    key_list = []
+    df = pd.read_excel(r'D:/11-15.xlsx')
+    df.columns = ['版本', '一级菜单', '二级菜单', '菜单点击次数', '菜单点击人数', '人均点击次数']
+    df = df.drop(0)
+    df = df[['二级菜单','菜单点击人数']]
+    df = df.dropna(axis=0,how='all')
+    df = df.groupby('二级菜单')['菜单点击人数'].sum()
+    every_data_tmp = df.to_dict()
+    every_data = {}
+    for item in every_data_tmp.items():
+        key = item[0]
+        key = re.sub(r'\W', '', key)
+        every_data[key] = item[1]
+    print(every_data)
+    return every_data
+
+
+def write_excel_one(data_list):
+    out_file_name = 'D:/res_data.xlsx'
+    data_list = data_list
+    row_num = 1
+    column_num = 24
+    wb = openpyxl.Workbook()
+    ws = wb.create_sheet('test')
+    ws.cell(row=1, column=1, value='十一月狂欢礼包')
+    ws.cell(row=1, column=2, value='十月精彩礼包')
+    ws.cell(row=1, column=3, value='签到礼包')
+    ws.cell(row=1, column=4, value='粉丝福利')
+    ws.cell(row=1, column=5, value='贵宾充值')
+    ws.cell(row=1, column=6, value='雄图霸业下载')
+    ws.cell(row=1, column=7, value='公告资讯')
+    ws.cell(row=1, column=8, value='关注礼包')
+    ws.cell(row=1, column=9, value='安锋官网')
+    ws.cell(row=1, column=10, value='游戏官网')
+    ws.cell(row=1, column=11, value='每日一题第二季')
+    ws.cell(row=1, column=12, value='游戏攻略')
+    ws.cell(row=1, column=13, value='游戏社区')
+    ws.cell(row=1, column=14, value='联系客服')
+
+
+    wb.save('D:/res_data.xlsx')
+
+
+
+
+def write_other():
+    example_dict = {''}
+    row_num = 1
+    data_list = get_excel()
+    wb = openpyxl.load_workbook('D:/res_data.xlsx')
+    ws = wb['test']
+    # for i in range(1,24):
+    #     cell_val = ws.cell(row=row_num,column=i).value
+    #     print(cell_val)
+
+
+    for item in data_list.items():
+        key = item[0]
+        val = item[1]
+        for i in range(1,12):
+            cell_val = ws.cell(row=row_num, column=i).value
+            if key == cell_val:
+                print(key)
+                ws.cell(row_num + 1, i).value = val
+
+    wb.save('D:/res_data.xlsx')
+
+
+write_other()
