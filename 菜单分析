@@ -1,0 +1,112 @@
+# -*- coding:UTF-8 -*-
+
+import pandas as pd
+import re
+from pprint import pprint
+import re
+from openpyxl.styles import *
+import openpyxl
+import collections
+import os
+
+file_list = []
+path = 'E:/wechat_data/'
+for file in os.listdir(path):
+    print(file)
+    file_path = path + file
+    file_list.append(file_path)
+
+print(file_list)
+def get_excel():
+    data_list = []
+    key_list = []
+    for f in file_list:
+        every_data = {}
+        df = pd.read_excel(f)
+        df.columns = ['版本', '一级菜单', '二级菜单', '菜单点击次数', '菜单点击人数', '人均点击次数']
+        df = df.drop(0)
+        df = df[['二级菜单','菜单点击人数']]
+        df = df.dropna(axis=0,how='all')
+        df = df.groupby('二级菜单')['菜单点击人数'].sum()
+        every_data_tmp = df.to_dict()
+
+        # print(every_data_tmp)
+        every_data = {}
+        for item in every_data_tmp.items():
+            key = item[0]
+            key = re.sub(r'\W','',key)
+            every_data[key] = item[1]
+            if key not in key_list:
+                key_list.append(key)
+
+        datetime = re.findall(r'\d{2}-\d{1,2}',f)[0]
+        every_data['datetime'] = datetime
+        print(every_data)
+        data_list.append(every_data)
+
+    res_data_list = []
+    for data in data_list:
+        cur_key_list = data.keys()
+        for all_key in key_list:
+            if all_key not in cur_key_list:
+                data[all_key] = -1
+        res_data_list.append(data)
+
+    return res_data_list,key_list
+
+
+def canvas(data_list,key_list):
+    out_file_name = 'E:/res_data.xlsx'
+    data_list = data_list
+    print(data_list)
+    key_list = key_list
+
+    row_num = 1
+    wb = openpyxl.Workbook()
+    ws = wb.create_sheet('data')
+
+    for i in range(1,len(key_list)):
+        j = i - 1
+        ws.cell(row=1, column=i, value=key_list[j])
+
+    for every_data in data_list:
+        for item in every_data.items():
+            key = item[0]
+            val = item[1]
+            for i in range(1,len(key_list)):
+                cell_val = ws.cell(row=row_num, column=i).value
+                if key == cell_val:
+                    ws.cell(row_num + 1, i).value = val
+        row_num += 1
+    wb.save(out_file_name)
+
+
+
+def fig(data_list):
+    data_list = data_list
+    for item in data_list:
+        menu_list = [item['十一月狂欢礼包'],item['十月精彩礼包'],item['签到礼包'],item['粉丝福利'],item['贵宾充值'],item['雄图霸业下载'],item['公告资讯'],item['关注礼包'],item['安锋官网'],item['游戏官网'],item['每日一题第二季'],item['游戏攻略'],item['游戏社区'],item['联系客服']]
+        print(menu_list)
+
+
+
+def test():
+    every_data = {}
+    f = 'E:/wechat_data/11-15.xlsx'
+    df = pd.read_excel(f)
+    df.columns=['版本','一级菜单','二级菜单','菜单点击次数','菜单点击人数','人均点击次数']
+    df = df.drop(0)
+    df = df[['二级菜单', '菜单点击人数']]
+    df = df.dropna(axis=0, how='all')
+    print(df)
+    df = df.groupby('二级菜单')['菜单点击人数'].sum()
+    df['datetime'] = re.findall(r'')
+
+    df_01 = df.to_dict()
+    print(df_01)
+
+
+data_list,key_list = get_excel()
+print(data_list)
+print(key_list)
+canvas(data_list,key_list)
