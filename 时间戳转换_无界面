@@ -1,0 +1,9 @@
+import datetime
+from tkinter import *
+
+
+
+timeStamp = 123456
+timeArray = datetime.datetime.utcfromtimestamp(timeStamp)
+formatTime = timeArray.strftime("%Y-%m-%d %H:%M:%S")
+print(formatTime)
