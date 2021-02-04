@@ -1,0 +1,36 @@
+import datetime
+from tkinter import *
+
+
+def transfer():
+    global e1
+    timeStamp = int(e1.get())
+    timeArray = datetime.datetime.utcfromtimestamp(timeStamp)
+    formatTime = timeArray.strftime("%Y-%m-%d %H:%M:%S")
+    print (formatTime)
+
+
+
+top = Tk()
+top.title('时间戳转换')
+top.geometry('500x300')
+top.config(bg='#535353')
+
+
+# 标签
+Label(top, text='时间戳:', fg='#F5F5F5', bg='#535353', justify=CENTER, font=('微软雅黑', 10)).grid(row=0, column=0, padx=30, pady=20)
+ip = StringVar
+e1 = Entry(top, textvariable=ip, justify=CENTER, font=('微软雅黑', 10), width=14)
+e1.grid(row=0, column=1,  pady=20)
+
+button_start = Button(top, text='运行', fg='#F5F5F5', bg='#7A7A7A', command=transfer, height=1, width=15, relief=GROOVE, bd=2,
+                activebackground='#F5F5F5', activeforeground='#535353')
+button_start.grid(row=1, column=0, padx=40)
+
+button_end = Button(top, text='退出', fg='#F5F5F5', bg='#7A7A7A', command=top.quit, height=1, width=15, relief=GROOVE,
+                bd=2, activebackground='#F5F5F5', activeforeground='#535353')
+button_end.grid(row=1, column=1)
+
+
+top.mainloop()
+
